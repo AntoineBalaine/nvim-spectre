@@ -113,6 +113,61 @@ M.close = function()
     end
 end
 
+-- Hide the spectre window without closing the buffer
+M.hide = function()
+    if state.bufnr ~= nil then
+        local wins = vim.fn.win_findbuf(state.bufnr)
+        if not wins then
+            return
+        end
+        -- Store window sizes before hiding
+        state.hidden_windows = {}
+        for _, win_id in pairs(wins) do
+            table.insert(state.hidden_windows, {
+
+                width = vim.api.nvim_win_get_width(win_id),
+                height = vim.api.nvim_win_get_height(win_id),
+            })
+            vim.api.nvim_win_close(win_id, true)
+        end
+        state.is_open = false
+        state.is_hidden = true
+    end
+end
+
+-- Show the hidden spectre window
+M.show = function()
+    if state.bufnr ~= nil and state.is_hidden and state.hidden_windows then
+        for _, win_data in ipairs(state.hidden_windows) do
+            -- Use the standard split command to create a new window
+            vim.cmd(state.user_config.open_cmd)
+
+            -- Set the buffer in the new window
+            local win_id = vim.api.nvim_get_current_win()
+            vim.api.nvim_win_set_buf(win_id, state.bufnr)
+
+            -- Try to restore the window size if possible
+            if win_data.width then
+                vim.api.nvim_win_set_width(win_id, win_data.width)
+            end
+            if win_data.height then
+                vim.api.nvim_win_set_height(win_id, win_data.height)
+            end
+
+            -- Apply any additional window settings
+            vim.api.nvim_win_set_option(win_id, 'wrap', false)
+        end
+        state.is_open = true
+        state.is_hidden = false
+        state.hidden_windows = nil
+
+        -- Position cursor at search input and enter insert mode at the end of the line
+        local line_content = vim.api.nvim_buf_get_lines(state.bufnr, 2, 3, false)[1] or ''
+        vim.api.nvim_win_set_cursor(0, { 3, #line_content })
+        vim.cmd('startinsert!')
+    end
+end
+
 M.open = function(opts)
     log.debug('Start')
     if state.user_config == nil then
@@ -201,7 +256,9 @@ end
 
 M.toggle = function(opts)
     if state.is_open then
-        M.close()
+        M.hide()
+    elseif state.is_hidden then
+        M.show()
     else
         M.open(opts)
     end

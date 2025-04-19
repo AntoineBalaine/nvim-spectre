@@ -50,6 +50,8 @@ local state = {
     total_item = {},
     is_running = false,
     is_open = false,
+    is_hidden = false,
+    hidden_windows = nil,
 }
 
 if _G.__is_dev then
