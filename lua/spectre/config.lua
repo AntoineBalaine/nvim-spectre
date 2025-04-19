@@ -222,6 +222,7 @@ local config = {
     is_open_target_win = true,
     is_insert_mode = false,
     is_block_ui_break = false,
+    auto_fold = false,
     fold_on_search = false,
     open_template = {},
 }

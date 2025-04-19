@@ -27,6 +27,7 @@ local utils = require('spectre.utils')
 local ui = require('spectre.ui')
 local log = require('spectre._log')
 local async = require('plenary.async')
+local fold = require('spectre.fold')
 
 local scheduler = async.util.scheduler
 
@@ -39,6 +40,7 @@ M.setup = function(cfg)
     end
     require('spectre.highlight').set_hl()
     M.check_replace_cmd_bins()
+    fold.setup(state.user_config)
 end
 
 M.check_replace_cmd_bins = function()
@@ -110,6 +112,7 @@ M.close = function()
             vim.api.nvim_win_close(win_id, true)
         end
         state.is_open = false
+        fold.clear_autocmds()
     end
 end
 
@@ -243,6 +246,10 @@ M.open = function(opts)
     end
 
     M.mapping_buffer(state.bufnr)
+
+    if fold._auto_folding_enabled then
+        fold.add_autocmds()
+    end
 
     if #opts.search_text > 0 then
         M.search({
@@ -813,6 +820,11 @@ M.tab_shift = function()
     if line == 7 then
         vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { 5, 1 })
     end
+end
+
+-- forwarding to fold module
+M.toggle_auto_folding = function()
+    fold.toggle_auto_folding()
 end
 
 return M

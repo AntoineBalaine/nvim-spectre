@@ -35,3 +35,9 @@ end, {
 	complete = "file",
     desc = "Global find and replace",
 })
+
+vim.api.nvim_create_user_command('SpectreToggleAutoFold', function()
+    require('spectre').toggle_auto_folding()
+end, {
+    desc = 'Toggle auto-folding in Spectre panel',
+})
