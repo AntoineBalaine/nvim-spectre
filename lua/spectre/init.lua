@@ -709,6 +709,15 @@ M.search = function(opts)
         search_paths = state.search_paths,
     })
     M.init_regex()
+
+    -- If fold_on_search is enabled, fold results after search completes
+    if state.user_config.fold_on_search then
+        vim.defer_fn(function()
+            if state.is_running == false then
+                vim.cmd('normal! zM')
+            end
+        end, 100)
+    end
 end
 
 M.init_regex = function()
