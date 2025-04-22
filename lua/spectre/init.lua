@@ -28,7 +28,7 @@ local ui = require('spectre.ui')
 local log = require('spectre._log')
 local async = require('plenary.async')
 local fold = require('spectre.fold')
-
+local actions = require('spectre.actions')
 local scheduler = async.util.scheduler
 
 local M = {}
@@ -825,6 +825,10 @@ end
 -- forwarding to fold module
 M.toggle_auto_folding = function()
     fold.toggle_auto_folding()
+end
+
+M.copy_enabled_filenames = function()
+    actions.copy_enabled_filenames()
 end
 
 return M

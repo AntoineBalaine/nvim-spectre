@@ -320,4 +320,34 @@ M.copy_current_line = function()
     vim.fn.setreg(vim.v.register, line_text)
 end
 
+-- Function to copy filenames of enabled results to clipboard
+M.copy_enabled_filenames = function()
+    local unique_files = {}
+    local file_list = {}
+
+    -- Collect unique filenames from enabled search results
+    for _, item in pairs(state.total_item) do
+        if item and item.filename and not item.disable then
+            if not unique_files[item.filename] then
+                unique_files[item.filename] = true
+                table.insert(file_list, item.filename)
+            end
+        end
+    end
+
+    if #file_list == 0 then
+        vim.notify('No enabled files found in search results', vim.log.levels.WARN)
+        return
+    end
+
+    -- Join filenames with newlines
+    local filenames_text = table.concat(file_list, ' ')
+
+    -- Copy to system clipboard
+    vim.fn.setreg('+', filenames_text)
+    vim.fn.setreg('"', filenames_text)
+
+    vim.notify(string.format('Copied %d enabled filenames to clipboard', #file_list), vim.log.levels.INFO)
+end
+
 return M

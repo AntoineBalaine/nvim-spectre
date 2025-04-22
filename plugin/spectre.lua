@@ -41,3 +41,9 @@ vim.api.nvim_create_user_command('SpectreToggleAutoFold', function()
 end, {
     desc = 'Toggle auto-folding in Spectre panel',
 })
+
+vim.api.nvim_create_user_command('SpectreCopyEnabledFilenames', function()
+    require('spectre').copy_enabled_filenames()
+end, {
+    desc = 'Copy enabled filenames to clipboard',
+})
